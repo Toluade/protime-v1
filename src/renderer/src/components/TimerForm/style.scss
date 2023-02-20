@@ -1,0 +1,58 @@
+// .darkMode > .form__body {
+//   color: var(--shade8);
+//   background: var(--shade7);
+// }
+// .lightMode > .form__body {
+//   color: var(--shade7);
+//   background: var(--shade9);
+// }
+
+.form__body {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  color: var(--shade1);
+  background: var(--shade5);
+  //   gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  // box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+
+  .form__title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .form__group {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+
+    font-size: 14px;
+
+    .form__input {
+      border: none;
+      outline: none;
+      border-radius: 4px;
+      padding: 5px;
+      // transition: all 0.3s;
+      color: var(--shade8);
+      background: var(--shade9);
+
+      &:focus {
+        outline: 1px solid var(--shade8);
+      }
+    }
+  }
+  .form__submit {
+    font-size: 14px;
+
+    color: var(--shade5);
+    background: var(--shade1);
+    padding: 5px 15px;
+    border-radius: 4px;
+  }
+}
