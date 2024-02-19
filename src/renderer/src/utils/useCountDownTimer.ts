@@ -44,15 +44,14 @@ const useCountDownTimer = (inputValue: number | undefined, isFormated: boolean):
   // const resumeTimer = (): void => setIsPaused(false)
   const stopTimer = (): void => {
     if (!timerStarted && inputValue) {
-      setCountDown(inputValue * 60 * 1000)
+      setCountDown(inputValue)
     } else {
       setCountDown((count) => count - count)
       setTimerStarted(false)
     }
   }
 
-  const resetTimer = (): void | null =>
-    inputValue !== undefined ? setCountDown(inputValue * 60 * 1000) : null
+  const resetTimer = (): void | null => (inputValue ? setCountDown(inputValue) : null)
 
   useEffect(() => {
     if (countDown === 0) {

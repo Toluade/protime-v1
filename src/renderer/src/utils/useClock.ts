@@ -1,38 +1,42 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
 
-const showTime = () => {
-  const [date, setDate] = useState(new Date());
+const showTime = (): string => {
+  const [date, setDate] = useState(new Date())
 
-  function refreshClock() {
-    setDate(new Date());
+  function refreshClock(): void {
+    setDate(new Date())
   }
   useEffect(() => {
-    const timerId = setInterval(refreshClock, 1000);
+    const timerId = setInterval(refreshClock, 1000)
     return function cleanup() {
-      clearInterval(timerId);
-    };
-  }, []);
+      clearInterval(timerId)
+    }
+  }, [])
 
   //   var date = new Date();
-  var h: any = date.getHours(); // 0 - 23
-  var m: any = date.getMinutes(); // 0 - 59
-  var s: any = date.getSeconds(); // 0 - 59
-  var session = "AM";
+  let h: number | string = date.getHours() // 0 - 23
+  let m: number | string = date.getMinutes() // 0 - 59
+  let s: number | string = date.getSeconds() // 0 - 59
+  let session = 'AM'
 
   if (h == 0) {
-    h = 12;
+    h = 12
+    session = 'AM'
+  }
+  if (h == 12) {
+    session = 'PM'
   }
 
   if (h > 12) {
-    h = h - 12;
-    session = "PM";
+    h = h - 12
+    session = 'PM'
   }
 
-  h = h < 10 ? "0" + h : h;
-  m = m < 10 ? "0" + m : m;
-  s = s < 10 ? "0" + s : s;
+  h = h < 10 ? '0' + h : h
+  m = m < 10 ? '0' + m : m
+  s = s < 10 ? '0' + s : s
 
-  var time = h + ":" + m + ":" + s + " " + session;
+  const time = h + ':' + m + ':' + s + ' ' + session
   // document.getElementById("MyClockDisplay").innerText = time;
   // document.getElementById("MyClockDisplay").textContent = time;
 
@@ -40,7 +44,7 @@ const showTime = () => {
   //     setTimeout(showTime, 1000);
   //   }, [h, m, s]);
 
-  return time;
-};
+  return time
+}
 
-export default showTime;
+export default showTime

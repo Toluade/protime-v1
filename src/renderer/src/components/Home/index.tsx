@@ -28,6 +28,7 @@ import Clock from '../Clock'
 import TimeUp from '../TimeUp'
 import Timer from '../Timer'
 import alarm from '../../assets/audio/alarm.mp3'
+import { feature } from '../../utils/storedItems'
 
 export const SettingsContext = createContext<SettingsProviderType>({})
 
@@ -62,10 +63,20 @@ const Home: FC = () => {
   const [view, setView] = useState(viewTypes.CLOCK)
 
   const [muted, setMuted] = useState<boolean>(true)
+  const [oneBg, setOneBg] = useState(
+    localStorage.getItem(feature.ONE_BG.enable) === 'true' ? true : false
+  )
 
+  const toggleOneBg = (): void => {
+    setOneBg((prev) => !prev)
+
+    if (localStorage.getItem(feature.ONE_BG.name) !== 'true') {
+      localStorage.setItem(feature.ONE_BG.name, feature.ONE_BG.options.TRUE)
+    }
+  }
   const toggleMute = (): void => setMuted(!muted)
 
-  const [countDownMin, setCountDownMin] = useState<number>()
+  const [countDownMin, setCountDownMin] = useState<number>(300000)
 
   const {
     hours,
@@ -89,7 +100,7 @@ const Home: FC = () => {
 
   const setContDownTime = (value: number | undefined): void => {
     if (value === undefined) return
-    setCountDown(value * 60 * 1000)
+    setCountDown(value)
     setCountDownMin(value)
     // onCloseP()
     setShowClock(false)
@@ -192,8 +203,66 @@ const Home: FC = () => {
     }
   }, [displayPreference])
 
+  // useEffect(() => {
+  //   const container = document.getElementById('container')
+  //   if (container && oneBg) {
+  //     container.classList.add('normalBg')
+  //     container.classList.remove('timeUp')
+  //     container.classList.remove('orangeBg')
+  //     container.classList.remove('redBg')
+  //     container.classList.remove('greenBg')
+  //     localStorage.setItem(feature.ONE_BG.enable, feature.ONE_BG.options.TRUE)
+  //     return
+  //   } else {
+  //     localStorage.setItem(feature.ONE_BG.enable, feature.ONE_BG.options.FALSE)
+  //   }
+  //   if (!showClock) {
+  //     if ((countDown < countDownMin * 0.05 || timeUp) && container !== null) {
+  //       container.classList.add('timeUp')
+  //       container.classList.remove('redBg')
+  //       container.classList.remove('greenBg')
+  //       container.classList.remove('orangeBg')
+  //       container.classList.remove('normalBg')
+  //     } else if (countDown < countDownMin * 0.2 && container !== null) {
+  //       container.classList.add('redBg')
+  //       container.classList.remove('timeUp')
+  //       container.classList.remove('greenBg')
+  //       container.classList.remove('orangeBg')
+  //       container.classList.remove('normalBg')
+  //     } else if (countDown < countDownMin * 0.5 && container !== null) {
+  //       container.classList.add('orangeBg')
+  //       container.classList.remove('timeUp')
+  //       container.classList.remove('greenBg')
+  //       container.classList.remove('redBg')
+  //       container.classList.remove('normalBg')
+  //     } else if (container !== null) {
+  //       container.classList.add('greenBg')
+  //       container.classList.remove('timeUp')
+  //       container.classList.remove('orangeBg')
+  //       container.classList.remove('redBg')
+  //       container.classList.remove('normalBg')
+  //     }
+  //   } else if (container !== null) {
+  //     container.classList.add('normalBg')
+  //     container.classList.remove('timeUp')
+  //     container.classList.remove('orangeBg')
+  //     container.classList.remove('redBg')
+  //     container.classList.remove('greenBg')
+  //   }
+  // }, [countDown, timeUp, showClock, oneBg])
   useEffect(() => {
     const container = document.getElementById('container')
+    if (container && oneBg) {
+      container.classList.add('normalBg')
+      container.classList.remove('timeUp')
+      container.classList.remove('orangeBg')
+      container.classList.remove('redBg')
+      container.classList.remove('greenBg')
+      localStorage.setItem(feature.ONE_BG.enable, feature.ONE_BG.options.TRUE)
+      return
+    } else {
+      localStorage.setItem(feature.ONE_BG.enable, feature.ONE_BG.options.FALSE)
+    }
     if (!showClock) {
       if ((countDown < 10000 || timeUp) && container !== null) {
         container.classList.add('timeUp')
@@ -227,11 +296,11 @@ const Home: FC = () => {
       container.classList.remove('redBg')
       container.classList.remove('greenBg')
     }
-  }, [countDown, timeUp, showClock])
+  }, [countDown, timeUp, showClock, oneBg])
 
   useEffect(() => {
     window.addEventListener('keydown', (evt) => {
-      if (evt.code === 'Space') {
+      if (evt.code === 'Space' || evt.code === 'Enter') {
         if (timerStarted) {
           pauseTimer()
         } else {
@@ -242,7 +311,7 @@ const Home: FC = () => {
 
     return () => {
       window.removeEventListener('keydown', (evt) => {
-        if (evt.code === 'Space') {
+        if (evt.code === 'Space' || evt.code === 'Enter') {
           if (timerStarted) {
             pauseTimer()
           } else {
@@ -280,6 +349,53 @@ const Home: FC = () => {
   //   }
   // }, [timeUp])
 
+  useEffect(() => {
+    const date = new Date()
+
+    if (
+      date &&
+      date.getMonth() !== feature.ONE_BG.expiryMonth &&
+      date.getFullYear() !== feature.ONE_BG.expiryYear &&
+      localStorage.getItem(feature.ONE_BG.name) === 'true'
+    ) {
+      localStorage.setItem(feature.ONE_BG.name, feature.ONE_BG.options.TRUE)
+    }
+  }, [])
+
+  useEffect(() => {
+    const iconContainer = document.getElementById('iconContainer')
+
+    window.addEventListener('mousemove', (event) => {
+      const mouseY = event.clientY
+      if (iconContainer && !isFullScreen) {
+        iconContainer.style.opacity = '1'
+        return
+      }
+
+      if (iconContainer && mouseY >= iconContainer?.getBoundingClientRect()?.y - 350) {
+        iconContainer.style.opacity = '1'
+      } else if (iconContainer && isFullScreen) {
+        iconContainer.style.opacity = '0'
+      }
+    })
+
+    return () =>
+      window.removeEventListener('mousemove', (event) => {
+        const mouseY = event.clientY
+
+        if (iconContainer && !isFullScreen) {
+          iconContainer.style.opacity = '1'
+          return
+        }
+
+        if (iconContainer && mouseY >= iconContainer?.getBoundingClientRect()?.y) {
+          iconContainer.style.opacity = '1'
+        } else if (iconContainer && isFullScreen) {
+          iconContainer.style.opacity = '0'
+        }
+      })
+  }, [isFullScreen])
+
   return (
     <Provider value={{ displayModes, displayPreference, setDisplayPreference }}>
       <div id="container" className={`container`} onDoubleClick={toggleFullScreen}>
@@ -288,7 +404,7 @@ const Home: FC = () => {
             <source src={alarm} type="audio/mpeg" />
           </audio>
         )}
-        <div className="iconContainer">
+        <div id="iconContainer" className="iconContainer">
           <div className="left">
             <button className="iconWrapper">
               <MdQueryBuilder title="Toggle clock" className="icon" onClick={toggleClock} />
@@ -320,7 +436,7 @@ const Home: FC = () => {
               onClose={onClose}
               // placement="bottom"
               closeOnBlur={true}
-              trigger="hover"
+              // trigger="hover"
             >
               <PopoverTrigger>
                 <button className="iconWrapper" aria-pressed="false" type="reset">
@@ -328,10 +444,9 @@ const Home: FC = () => {
                 </button>
               </PopoverTrigger>
               <PopoverContent className="popover-content">
-                {/* <PopoverArrow /> */}
                 <PopoverCloseButton className="popover-close-button" />
                 <PopoverBody>
-                  <TimerForm ref={inputRef} {...{ setContDownTime }} />
+                  <TimerForm ref={inputRef} {...{ setContDownTime, toggleOneBg, oneBg, onClose }} />
                 </PopoverBody>
               </PopoverContent>
             </Popover>
